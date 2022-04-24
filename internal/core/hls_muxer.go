@@ -66,7 +66,6 @@ const create = () => {
 
 	} else {
 		const hls = new Hls({
-			progressive: true,
 			liveSyncDurationCount: 3,
 			liveMaxLatencyDurationCount: 4,
 		});
@@ -448,7 +447,7 @@ func (m *hlsMuxer) handleRequest(req hlsMuxerRequest) hlsMuxerResponse {
 			body: m.muxer.PlaylistReader(),
 		}
 
-	case strings.HasSuffix(req.file, ".ts"):
+	case strings.HasSuffix(req.file, ".ts"), strings.HasSuffix(req.file, ".mp4"), strings.HasSuffix(req.file, ".m4s"):
 		r := m.muxer.SegmentReader(req.file)
 		if r == nil {
 			return hlsMuxerResponse{status: http.StatusNotFound}
