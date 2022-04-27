@@ -37,6 +37,38 @@ func mp4SegmentGenerate(
 
 	w := newMP4Writer()
 
+	_, err := w.writeBox(&mp4.Styp{ // <styp/>
+		MajorBrand:   [4]byte{'m', 's', 'd', 'h'},
+		MinorVersion: 0,
+		CompatibleBrands: []mp4.CompatibleBrandElem{
+			{CompatibleBrand: [4]byte{'m', 's', 'd', 'h'}},
+			{CompatibleBrand: [4]byte{'m', 's', 'i', 'x'}},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = w.writeBox(&mp4.Sidx{ // </sidx>
+		FullBox: mp4.FullBox{
+			Version: 1,
+		},
+		ReferenceID:                1,
+		Timescale:                  fmp4Timescale,
+		EarliestPresentationTimeV1: 0,
+		ReferenceCount:             1,
+		References: []mp4.SidxReference{
+			{
+				ReferencedSize:     989798, // TODO
+				SubsegmentDuration: 128000, // TODO
+				StartsWithSAP:      true,
+			},
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	moofOffset, err := w.writeBoxStart(&mp4.Moof{}) // <moof>
 	if err != nil {
 		return nil, err

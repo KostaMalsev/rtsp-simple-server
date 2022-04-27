@@ -453,10 +453,22 @@ func (m *hlsMuxer) handleRequest(req hlsMuxerRequest) hlsMuxerResponse {
 			return hlsMuxerResponse{status: http.StatusNotFound}
 		}
 
+		var contentType string
+		switch {
+		case strings.HasSuffix(req.file, ".ts"):
+			contentType = "video/MP2T"
+
+		case strings.HasSuffix(req.file, ".mp4"):
+			contentType = "video/mp4"
+
+		case strings.HasSuffix(req.file, ".m4s"):
+			contentType = "video/mp4"
+		}
+
 		return hlsMuxerResponse{
 			status: http.StatusOK,
 			header: map[string]string{
-				"Content-Type": `video/MP2T`,
+				"Content-Type": contentType,
 			},
 			body: r,
 		}

@@ -38,12 +38,13 @@ func mp4InitGenerate(videoTrack *gortsplib.TrackH264, audioTrack *gortsplib.Trac
 	w := newMP4Writer()
 
 	_, err := w.writeBox(&mp4.Ftyp{ // <ftyp/>
-		MajorBrand:   mp4.BrandISO5(),
-		MinorVersion: 512,
+		MajorBrand:   [4]byte{'m', 'p', '4', '2'},
+		MinorVersion: 1,
 		CompatibleBrands: []mp4.CompatibleBrandElem{
-			{CompatibleBrand: mp4.BrandISO5()},
-			{CompatibleBrand: mp4.BrandISO6()},
-			{CompatibleBrand: mp4.BrandMP41()},
+			{CompatibleBrand: [4]byte{'m', 'p', '4', '1'}},
+			{CompatibleBrand: [4]byte{'m', 'p', '4', '2'}},
+			{CompatibleBrand: [4]byte{'i', 's', 'o', 'm'}},
+			{CompatibleBrand: [4]byte{'h', 'l', 's', 'f'}},
 		},
 	})
 	if err != nil {
@@ -58,7 +59,7 @@ func mp4InitGenerate(videoTrack *gortsplib.TrackH264, audioTrack *gortsplib.Trac
 	_, err = w.writeBox(&mp4.Mvhd{ // <mvhd/>
 		Timescale:   1000,
 		Rate:        65536,
-		Volume:      0,
+		Volume:      1,
 		Matrix:      [9]int32{0x00010000, 0, 0, 0, 0x00010000, 0, 0, 0, 0x40000000},
 		NextTrackID: 2,
 	})
@@ -84,6 +85,9 @@ func mp4InitGenerate(videoTrack *gortsplib.TrackH264, audioTrack *gortsplib.Trac
 	height := spsp.Height()
 
 	_, err = w.writeBox(&mp4.Tkhd{ // <tkhd/>
+		FullBox: mp4.FullBox{
+			Flags: [3]byte{0, 0, 3},
+		},
 		TrackID: 1,
 		Width:   uint32(width * 65536),
 		Height:  uint32(height * 65536),
@@ -119,7 +123,11 @@ func mp4InitGenerate(videoTrack *gortsplib.TrackH264, audioTrack *gortsplib.Trac
 		return nil, err
 	}
 
-	_, err = w.writeBox(&mp4.Vmhd{}) // <vmhd/>
+	_, err = w.writeBox(&mp4.Vmhd{// <vmhd/>
+		FullBox: mp4.FullBox{
+			Flags: [3]byte{0, 0, 1},
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -293,6 +301,7 @@ func mp4InitGenerate(videoTrack *gortsplib.TrackH264, audioTrack *gortsplib.Trac
 	_, err = w.writeBox(&mp4.Trex{ // <trex/>
 		TrackID:                       1,
 		DefaultSampleDescriptionIndex: 1,
+		DefaultSampleFlags: 16842752,
 	})
 	if err != nil {
 		return nil, err

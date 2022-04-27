@@ -93,13 +93,13 @@ func (p *muxerVariantFMP4Playlist) playlistReader() io.Reader {
 		cnt += "#EXT-X-TARGETDURATION:" + strconv.FormatUint(uint64(targetDuration), 10) + "\n"
 
 		cnt += "#EXT-X-MEDIA-SEQUENCE:" + strconv.FormatInt(int64(p.segmentDeleteCount), 10) + "\n"
-		cnt += "#EXT-X-INDEPENDENT-SEGMENTS" + "\n"
+		// cnt += "#EXT-X-INDEPENDENT-SEGMENTS" + "\n"
 		cnt += "#EXT-X-MAP:URI=\"init.mp4\"\n"
 		cnt += "\n"
 
 		for _, s := range p.segments {
-			cnt += "#EXT-X-PROGRAM-DATE-TIME:" + s.startTime.Format("2006-01-02T15:04:05.999Z07:00") + "\n" +
-				"#EXTINF:" + strconv.FormatFloat(s.duration().Seconds(), 'f', -1, 64) + ",\n" +
+			//cnt += "#EXT-X-PROGRAM-DATE-TIME:" + s.startTime.Format("2006-01-02T15:04:05.999Z07:00") + "\n" +
+			cnt += "#EXTINF:" + strconv.FormatFloat(s.duration().Seconds(), 'f', -1, 64) + ",\n" +
 				s.name + ".m4s\n"
 		}
 
