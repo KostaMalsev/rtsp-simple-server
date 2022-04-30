@@ -114,6 +114,7 @@ RUN go build -o /out .
 WORKDIR /
 ARG CONFIG_RUN
 RUN echo "$$CONFIG_RUN" > rtsp-simple-server.yml
+RUN apk update && apk add bash
 endef
 export DOCKERFILE_RUN
 
